@@ -154,9 +154,9 @@ static void mctl_set_addrmap(struct dram_para *para)
 		cols -= 1;
 
 	/* Ranks */
-	// if (ranks == 2)
-	// 	mctl_ctl->addrmap[0] = rows + cols - 3;
-	// else
+	if (ranks == 2)
+		mctl_ctl->addrmap[0] = rows + cols - 3;
+	else
 		mctl_ctl->addrmap[0] = 0x1F;
 
 	/* Banks, hardcoded to 8 banks now */
@@ -164,65 +164,65 @@ static void mctl_set_addrmap(struct dram_para *para)
 
 	/* Columns */
 	mctl_ctl->addrmap[2] = 0;
-	// switch (cols) {
-	// case 7:
-	// 	mctl_ctl->addrmap[3] = 0x1F1F1F00;
-	// 	mctl_ctl->addrmap[4] = 0x1F1F;
-	// 	break;
-	// case 8:
-	// 	mctl_ctl->addrmap[3] = 0x1F1F0000;
-	// 	mctl_ctl->addrmap[4] = 0x1F1F;
-	// 	break;
-	// case 9:
-	// 	mctl_ctl->addrmap[3] = 0x1F000000;
-	// 	mctl_ctl->addrmap[4] = 0x1F1F;
-	// 	break;
-	// case 10:
+	switch (cols) {
+	case 7:
+		mctl_ctl->addrmap[3] = 0x1F1F1F00;
+		mctl_ctl->addrmap[4] = 0x1F1F;
+		break;
+	case 8:
+		mctl_ctl->addrmap[3] = 0x1F1F0000;
+		mctl_ctl->addrmap[4] = 0x1F1F;
+		break;
+	case 9:
+		mctl_ctl->addrmap[3] = 0x1F000000;
+		mctl_ctl->addrmap[4] = 0x1F1F;
+		break;
+	case 10:
 		mctl_ctl->addrmap[3] = 0;
 		mctl_ctl->addrmap[4] = 0x1F1F;
-	// 	break;
-	// case 11:
-	// 	mctl_ctl->addrmap[3] = 0;
-	// 	mctl_ctl->addrmap[4] = 0x1F00;
-	// 	break;
-	// case 12:
-	// 	mctl_ctl->addrmap[3] = 0;
-	// 	mctl_ctl->addrmap[4] = 0;
-	// 	break;
-	// default:
-	// 	panic("Unsupported DRAM configuration: column number invalid\n");
-	// }
+		break;
+	case 11:
+		mctl_ctl->addrmap[3] = 0;
+		mctl_ctl->addrmap[4] = 0x1F00;
+		break;
+	case 12:
+		mctl_ctl->addrmap[3] = 0;
+		mctl_ctl->addrmap[4] = 0;
+		break;
+	default:
+		panic("Unsupported DRAM configuration: column number invalid\n");
+	}
 
 	/* Rows */
 	mctl_ctl->addrmap[5] = 0x07070707;
-	// switch (rows) {
-	// case 13:
+	switch (rows) {
+	case 13:
 		mctl_ctl->addrmap[6] = 0x0f070707;
 		mctl_ctl->addrmap[7] = 0x0F0F;
-	// 	break;
-	// case 14:
-	// 	mctl_ctl->addrmap[6] = (cols - 3) | ((cols - 3) << 8) | 0x0F0F0000;
-	// 	mctl_ctl->addrmap[7] = 0x0F0F;
-	// 	break;
-	// case 15:
-	// 	mctl_ctl->addrmap[6] = (cols - 3) | ((cols - 3) << 8) | ((cols - 3) << 16) | 0x0F000000;
-	// 	mctl_ctl->addrmap[7] = 0x0F0F;
-	// 	break;
-	// case 16:
-	// 	mctl_ctl->addrmap[6] = (cols - 3) | ((cols - 3) << 8) | ((cols - 3) << 16) | ((cols - 3) << 24);
-	// 	mctl_ctl->addrmap[7] = 0x0F0F;
-	// 	break;
-	// case 17:
-	// 	mctl_ctl->addrmap[6] = (cols - 3) | ((cols - 3) << 8) | ((cols - 3) << 16) | ((cols - 3) << 24);
-	// 	mctl_ctl->addrmap[7] = (cols - 3) | 0x0F00;
-	// 	break;
-	// case 18:
-	// 	mctl_ctl->addrmap[6] = (cols - 3) | ((cols - 3) << 8) | ((cols - 3) << 16) | ((cols - 3) << 24);
-	// 	mctl_ctl->addrmap[7] = (cols - 3) | ((cols - 3) << 8);
-	// 	break;
-	// default:
-	// 	panic("Unsupported DRAM configuration: row number invalid\n");
-	// }
+		break;
+	case 14:
+		mctl_ctl->addrmap[6] = (cols - 3) | ((cols - 3) << 8) | 0x0F0F0000;
+		mctl_ctl->addrmap[7] = 0x0F0F;
+		break;
+	case 15:
+		mctl_ctl->addrmap[6] = (cols - 3) | ((cols - 3) << 8) | ((cols - 3) << 16) | 0x0F000000;
+		mctl_ctl->addrmap[7] = 0x0F0F;
+		break;
+	case 16:
+		mctl_ctl->addrmap[6] = (cols - 3) | ((cols - 3) << 8) | ((cols - 3) << 16) | ((cols - 3) << 24);
+		mctl_ctl->addrmap[7] = 0x0F0F;
+		break;
+	case 17:
+		mctl_ctl->addrmap[6] = (cols - 3) | ((cols - 3) << 8) | ((cols - 3) << 16) | ((cols - 3) << 24);
+		mctl_ctl->addrmap[7] = (cols - 3) | 0x0F00;
+		break;
+	case 18:
+		mctl_ctl->addrmap[6] = (cols - 3) | ((cols - 3) << 8) | ((cols - 3) << 16) | ((cols - 3) << 24);
+		mctl_ctl->addrmap[7] = (cols - 3) | ((cols - 3) << 8);
+		break;
+	default:
+		panic("Unsupported DRAM configuration: row number invalid\n");
+	}
 
 	/* Bank groups, DDR4 only */
 	mctl_ctl->addrmap[8] = 0x3F3F;
