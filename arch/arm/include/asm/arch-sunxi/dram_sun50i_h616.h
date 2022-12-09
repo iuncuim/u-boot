@@ -19,9 +19,9 @@
 
 enum sunxi_dram_type {
 	SUNXI_DRAM_TYPE_DDR3 = 3,
-	SUNXI_DRAM_TYPE_DDR4,
+	SUNXI_DRAM_TYPE_DDR4 = 4,
 	SUNXI_DRAM_TYPE_LPDDR3 = 7,
-	SUNXI_DRAM_TYPE_LPDDR4
+	SUNXI_DRAM_TYPE_LPDDR4 = 8
 };
 
 /* MBUS part is largely the same as in H6, except for one special register */
@@ -130,12 +130,13 @@ check_member(sunxi_mctl_ctl_reg, unk_0x4240, 0x4240);
 #define MSTR_DEVICETYPE_LPDDR2	BIT(2)
 #define MSTR_DEVICETYPE_LPDDR3	BIT(3)
 #define MSTR_DEVICETYPE_DDR4	BIT(4)
+#define MSTR_DEVICETYPE_LPDDR4	BIT(5)
 #define MSTR_DEVICETYPE_MASK	GENMASK(5, 0)
 #define MSTR_2TMODE		BIT(10)
 #define MSTR_BUSWIDTH_FULL	(0 << 12)
 #define MSTR_BUSWIDTH_HALF	(1 << 12)
 #define MSTR_ACTIVE_RANKS(x)	(((x == 2) ? 3 : 1) << 24)
-#define MSTR_BURST_LENGTH(x)	(((x) >> 1) << 16)
+#define MSTR_BURST_LENGTH(x)	((x) << 16)
 
 struct dram_para {
 	u32 clk;

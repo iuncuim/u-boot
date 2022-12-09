@@ -67,6 +67,15 @@ void clock_init_uart(void)
 	/* deassert uart reset */
 	setbits_le32(&ccm->uart_gate_reset,
 		     1 << (RESET_SHIFT + CONFIG_CONS_INDEX - 1));
+
+	clrbits_le32(0x07000208,0x100);
+	clrbits_le32(0x07000200,0x3010030);
+	clrbits_le32(0x030019ec,0x10000);
+	setbits_le32(0x030019ec,0x10001);
+	clrsetbits_le32(0x05070000,0xffff0000,0x5dbf0000);
+	clrsetbits_le32(0x05070004,0x40000,0x90000);
+	writel(0,0x05070028);
+	writel(1,0x05070038);
 }
 
 #ifdef CONFIG_SPL_BUILD

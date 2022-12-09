@@ -15,6 +15,7 @@
 #include <axp305.h>
 #include <axp809.h>
 #include <axp818.h>
+#include <axp858.h>
 
 #define AXP_PMIC_MODE_REG		0x3e
 #define AXP_PMIC_MODE_I2C		0x00

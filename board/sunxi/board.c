@@ -586,9 +586,8 @@ void sunxi_board_init(void)
 
 #if defined CONFIG_AXP152_POWER || defined CONFIG_AXP209_POWER || \
 	defined CONFIG_AXP221_POWER || defined CONFIG_AXP305_POWER || \
-	defined CONFIG_AXP809_POWER || defined CONFIG_AXP818_POWER
+	defined CONFIG_AXP809_POWER || defined CONFIG_AXP858_POWER 
 	power_failed = axp_init();
-
 	if (IS_ENABLED(CONFIG_AXP_DISABLE_BOOT_ON_POWERON) && !power_failed) {
 		u8 boot_reason;
 
@@ -599,58 +598,13 @@ void sunxi_board_init(void)
 		}
 	}
 
-#if defined CONFIG_AXP221_POWER || defined CONFIG_AXP809_POWER || \
-	defined CONFIG_AXP818_POWER
+#if defined CONFIG_AXP858_POWER
 	power_failed |= axp_set_dcdc1(CONFIG_AXP_DCDC1_VOLT);
-#endif
-#if !defined(CONFIG_AXP305_POWER)
 	power_failed |= axp_set_dcdc2(CONFIG_AXP_DCDC2_VOLT);
 	power_failed |= axp_set_dcdc3(CONFIG_AXP_DCDC3_VOLT);
-#endif
-#if !defined(CONFIG_AXP209_POWER) && !defined(CONFIG_AXP818_POWER)
-	power_failed |= axp_set_dcdc4(CONFIG_AXP_DCDC4_VOLT);
-#endif
-#if defined CONFIG_AXP221_POWER || defined CONFIG_AXP809_POWER || \
-	defined CONFIG_AXP818_POWER
 	power_failed |= axp_set_dcdc5(CONFIG_AXP_DCDC5_VOLT);
 #endif
 
-#if defined CONFIG_AXP221_POWER || defined CONFIG_AXP809_POWER || \
-	defined CONFIG_AXP818_POWER
-	power_failed |= axp_set_aldo1(CONFIG_AXP_ALDO1_VOLT);
-#endif
-#if !defined(CONFIG_AXP305_POWER)
-	power_failed |= axp_set_aldo2(CONFIG_AXP_ALDO2_VOLT);
-#endif
-#if !defined(CONFIG_AXP152_POWER) && !defined(CONFIG_AXP305_POWER)
-	power_failed |= axp_set_aldo3(CONFIG_AXP_ALDO3_VOLT);
-#endif
-#ifdef CONFIG_AXP209_POWER
-	power_failed |= axp_set_aldo4(CONFIG_AXP_ALDO4_VOLT);
-#endif
-
-#if defined(CONFIG_AXP221_POWER) || defined(CONFIG_AXP809_POWER) || \
-	defined(CONFIG_AXP818_POWER)
-	power_failed |= axp_set_dldo(1, CONFIG_AXP_DLDO1_VOLT);
-	power_failed |= axp_set_dldo(2, CONFIG_AXP_DLDO2_VOLT);
-#if !defined CONFIG_AXP809_POWER
-	power_failed |= axp_set_dldo(3, CONFIG_AXP_DLDO3_VOLT);
-	power_failed |= axp_set_dldo(4, CONFIG_AXP_DLDO4_VOLT);
-#endif
-	power_failed |= axp_set_eldo(1, CONFIG_AXP_ELDO1_VOLT);
-	power_failed |= axp_set_eldo(2, CONFIG_AXP_ELDO2_VOLT);
-	power_failed |= axp_set_eldo(3, CONFIG_AXP_ELDO3_VOLT);
-#endif
-
-#ifdef CONFIG_AXP818_POWER
-	power_failed |= axp_set_fldo(1, CONFIG_AXP_FLDO1_VOLT);
-	power_failed |= axp_set_fldo(2, CONFIG_AXP_FLDO2_VOLT);
-	power_failed |= axp_set_fldo(3, CONFIG_AXP_FLDO3_VOLT);
-#endif
-
-#if defined CONFIG_AXP809_POWER || defined CONFIG_AXP818_POWER
-	power_failed |= axp_set_sw(IS_ENABLED(CONFIG_AXP_SW_ON));
-#endif
 #endif
 	printf("DRAM:");
 	gd->ram_size = sunxi_dram_init();
@@ -668,6 +622,25 @@ void sunxi_board_init(void)
 		clock_set_pll1(get_board_sys_clk());
 	else
 		printf("Failed to set core voltage! Can't set CPU frequency\n");
+	// uint32_t* base=0x047FA000u;
+	// int a;
+	// printf("=> md.l 0x047FA000 \n");
+	// for( a = 0; a < 82; a = a + 1 ){
+	// 	printf("%08x: %08x %08x %08x %08x\n",base,*base,*(base+0x1),*(base+0x2),*(base+0x3));
+	// 	base=base+0x4u;
+	// }
+	// base=0x047FB000u;
+	// printf("=> md.l 0x047FB000 \n");
+	// for( a = 0; a < 51; a = a + 1 ){
+	// 	printf("%08x: %08x %08x %08x %08x\n",base,*base,*(base+0x1),*(base+0x2),*(base+0x3));
+	// 	base=base+0x4u;
+	// }
+	// base=0x04800000u;
+	// printf("=> md.l 0x04800000 \n");
+	// for( a = 0; a < 184; a = a + 1 ){
+	// 	printf("%08x: %08x %08x %08x %08x\n",base,*base,*(base+0x1),*(base+0x2),*(base+0x3));
+	// 	base=base+0x4u;
+	// }
 }
 #endif
 
