@@ -808,15 +808,35 @@ static bool mctl_phy_init(struct dram_para *para)
 		writel(phy_init[i], &ptr[i]);
 
 	if (para->tpr10 & TPR10_UNKNOWN_FEAT0) {
+		if (para->tpr0 & BIT(30))
+			val = (para->tpr0 >> 7) & 0x3e;
+		else
+			val = (para->tpr10 >> 3) & 0x1e;
+
 		ptr = (u32 *)(SUNXI_DRAM_PHY0_BASE + 0x780);
 		for (i = 0; i < 32; i++)
-			writel(0x16, &ptr[i]);
-		writel(0xe, SUNXI_DRAM_PHY0_BASE + 0x78c);
-		writel(0xe, SUNXI_DRAM_PHY0_BASE + 0x7a4);
-		writel(0xe, SUNXI_DRAM_PHY0_BASE + 0x7b8);
-		writel(0x8, SUNXI_DRAM_PHY0_BASE + 0x7d4);
-		writel(0xe, SUNXI_DRAM_PHY0_BASE + 0x7dc);
-		writel(0xe, SUNXI_DRAM_PHY0_BASE + 0x7e0);
+			writel(val, &ptr[i]);
+
+		val = (para->tpr10 << 1) & 0x1e;
+		writel(val, SUNXI_DRAM_PHY0_BASE + 0x7dc);
+		writel(val, SUNXI_DRAM_PHY0_BASE + 0x7e0);
+
+		/* following configuration is DDR3 specific */
+		val = (para->tpr10 >> 7) & 0x1e;
+		writel(val, SUNXI_DRAM_PHY0_BASE + 0x7d4);
+		/*
+		 * TODO: Offsets 0x79c, 0x794 and 0x7e4 may need
+		 * to be set here. However, this doesn't seem to
+		 * be needed by any board seen in the wild for now.
+		 * It's not implemented because it would unnecessarily
+		 * introduce PARA2 and TPR2 options.
+		 */
+		if (para->tpr0 & BIT(31)) {
+			val = (para->tpr0 << 1) & 0x3e;
+			writel(val, SUNXI_DRAM_PHY0_BASE + 0x78c);
+			writel(val, SUNXI_DRAM_PHY0_BASE + 0x7a4);
+			writel(val, SUNXI_DRAM_PHY0_BASE + 0x7b8);
+		}
 	}
 
 	writel(0x80, SUNXI_DRAM_PHY0_BASE + 0x3dc);
@@ -1110,6 +1130,7 @@ unsigned long sunxi_dram_init(void)
 		.dx_dri = CONFIG_DRAM_SUN50I_H616_DX_DRI,
 		.ca_dri = CONFIG_DRAM_SUN50I_H616_CA_DRI,
 		.odt_en = CONFIG_DRAM_SUN50I_H616_ODT_EN,
+		.tpr0 = CONFIG_DRAM_SUN50I_H616_TPR0,
 		.tpr10 = CONFIG_DRAM_SUN50I_H616_TPR10,
 		.tpr11 = CONFIG_DRAM_SUN50I_H616_TPR11,
 		.tpr12 = CONFIG_DRAM_SUN50I_H616_TPR12,
