@@ -145,6 +145,7 @@ check_member(sunxi_mctl_ctl_reg, unk_0x4240, 0x4240);
 #define TPR10_READ_CALIBRATION	BIT(21)
 #define TPR10_READ_TRAINING	BIT(22)
 #define TPR10_WRITE_TRAINING	BIT(23)
+#define TPR10_UNKNOWN_FEAT3	BIT(30)
 
 struct dram_para {
 	u32 clk;
@@ -156,7 +157,10 @@ struct dram_para {
 	u32 dx_odt;
 	u32 dx_dri;
 	u32 ca_dri;
+	u32 odt_en;
 	u32 tpr10;
+	u32 tpr11;
+	u32 tpr12;
 };
 
 
