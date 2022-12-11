@@ -137,6 +137,15 @@ check_member(sunxi_mctl_ctl_reg, unk_0x4240, 0x4240);
 #define MSTR_ACTIVE_RANKS(x)	(((x == 2) ? 3 : 1) << 24)
 #define MSTR_BURST_LENGTH(x)	(((x) >> 1) << 16)
 
+/* TODO: figure out what unknown features do */
+#define TPR10_UNKNOWN_FEAT0	BIT(16)
+#define TPR10_UNKNOWN_FEAT1	BIT(17)
+#define TPR10_UNKNOWN_FEAT2	BIT(18)
+#define TPR10_WRITE_LEVELING	BIT(20)
+#define TPR10_READ_CALIBRATION	BIT(21)
+#define TPR10_READ_TRAINING	BIT(22)
+#define TPR10_WRITE_TRAINING	BIT(23)
+
 struct dram_para {
 	u32 clk;
 	enum sunxi_dram_type type;
@@ -147,6 +156,7 @@ struct dram_para {
 	u32 dx_odt;
 	u32 dx_dri;
 	u32 ca_dri;
+	u32 tpr10;
 };
 
 
