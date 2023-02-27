@@ -32,7 +32,7 @@ static int pmic_i2c_address(void)
 {
 	if (IS_ENABLED(CONFIG_AXP152_POWER))
 		return AXP152_I2C_ADDR;
-	if (IS_ENABLED(CONFIG_AXP305_POWER))
+	if (IS_ENABLED(CONFIG_AXP305_POWER) || IS_ENABLED(CONFIG_AXP313_POWER))
 		return AXP305_I2C_ADDR;
 
 	/* Other AXP2xx and AXP8xx variants */

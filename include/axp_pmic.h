@@ -13,6 +13,7 @@
 #include <axp209.h>
 #include <axp221.h>
 #include <axp305.h>
+#include <axp313.h>
 #include <axp809.h>
 #include <axp818.h>
 
