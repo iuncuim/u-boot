@@ -154,7 +154,11 @@ static void mctl_set_addrmap(struct dram_para *para)
 
 	/* Ranks */
 	if (ranks == 2)
+#ifdef CONFIG_DRAM_LPDDR3_6GBIT_QUIRK
+		mctl_ctl->addrmap[0] = rows + cols - 5;
+#else
 		mctl_ctl->addrmap[0] = rows + cols - 3;
+#endif
 	else
 		mctl_ctl->addrmap[0] = 0x1F;
 
@@ -204,7 +208,11 @@ static void mctl_set_addrmap(struct dram_para *para)
 		mctl_ctl->addrmap[7] = 0x0F0F;
 		break;
 	case 15:
+#ifdef CONFIG_DRAM_LPDDR3_6GBIT_QUIRK
+		mctl_ctl->addrmap[6] = (cols - 3) | ((cols - 2) << 8) | ((cols - 2) << 16) | 0x0F000000;
+#else
 		mctl_ctl->addrmap[6] = (cols - 3) | ((cols - 3) << 8) | ((cols - 3) << 16) | 0x0F000000;
+#endif
 		mctl_ctl->addrmap[7] = 0x0F0F;
 		break;
 	case 16:
@@ -1206,7 +1214,11 @@ static unsigned long mctl_calc_size(struct dram_para *para)
 	u8 width = para->bus_full_width ? 4 : 2;
 
 	/* 8 banks */
+#ifdef CONFIG_DRAM_LPDDR3_6GBIT_QUIRK
+	return (1ULL << (para->cols + para->rows + 3)) * width * para->ranks * 3 / 4;
+#else
 	return (1ULL << (para->cols + para->rows + 3)) * width * para->ranks;
+#endif
 }
 
 unsigned long sunxi_dram_init(void)

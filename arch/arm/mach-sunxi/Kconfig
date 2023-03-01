@@ -96,6 +96,10 @@ config DRAM_SUN50I_H616_TPR12
 	default 0x0
 	help
 	  TPR12 value from vendor DRAM settings.
+
+config DRAM_LPDDR3_6GBIT_QUIRK
+	bool "H616 6Gbit LPDDR3 DRAM quirks"
+
 endif
 
 config SUN6I_PRCM
