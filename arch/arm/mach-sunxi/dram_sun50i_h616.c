@@ -12,6 +12,7 @@
  * (C) Copyright 2020 Jernej Skrabec <jernej.skrabec@siol.net>
  *
  */
+#define DEBUG
 #include <common.h>
 #include <init.h>
 #include <log.h>
@@ -249,6 +250,13 @@ static const u8 phy_init_lpddr3[] = {
 	0x17, 0x19, 0x1a
 };
 
+static const u8 phy_init_lpddr4[] = {
+	0x03, 0x00, 0x17, 0x05, 0x02, 0x19, 0x06, 0x07,
+	0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+	0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x01,
+	0x18, 0x04, 0x1a
+};
+
 static void mctl_phy_configure_odt(struct dram_para *para)
 {
 	unsigned int val;
@@ -298,6 +306,17 @@ static void mctl_phy_configure_odt(struct dram_para *para)
 		writel_relaxed(0, SUNXI_DRAM_PHY0_BASE + 0x3c0);
 		writel_relaxed(0, SUNXI_DRAM_PHY0_BASE + 0x400);
 		writel_relaxed(0, SUNXI_DRAM_PHY0_BASE + 0x440);
+	}
+
+	if (para->type == SUNXI_DRAM_TYPE_LPDDR4){
+		writel_relaxed(4, SUNXI_DRAM_PHY0_BASE + 0x38c);
+		writel_relaxed(4, SUNXI_DRAM_PHY0_BASE + 0x3cc);
+		writel_relaxed(4, SUNXI_DRAM_PHY0_BASE + 0x40c);
+		writel_relaxed(4, SUNXI_DRAM_PHY0_BASE + 0x44c);
+		writel_relaxed(0, SUNXI_DRAM_PHY0_BASE + 0x384);
+		writel_relaxed(0, SUNXI_DRAM_PHY0_BASE + 0x3c4);
+		writel_relaxed(0, SUNXI_DRAM_PHY0_BASE + 0x404);
+		writel_relaxed(0, SUNXI_DRAM_PHY0_BASE + 0x444);
 	}
 
 	dmb();
@@ -804,6 +823,9 @@ static bool mctl_phy_init(struct dram_para *para)
 	u32 val, *ptr;
 	int i;
 
+	if (para->type == SUNXI_DRAM_TYPE_LPDDR4)
+		clrbits_le32(SUNXI_DRAM_PHY0_BASE + 0x4,0x80);
+
 	if (para->bus_full_width)
 		val = 0xf;
 	else
@@ -843,6 +865,23 @@ static bool mctl_phy_init(struct dram_para *para)
 		writel(8, SUNXI_DRAM_PHY0_BASE + 0x37c);	
 	}
 
+	if (para->type == SUNXI_DRAM_TYPE_LPDDR4) {
+		writel(0x14, SUNXI_DRAM_PHY0_BASE + 0x14);
+		writel(0x14, SUNXI_DRAM_PHY0_BASE + 0x35c);
+		writel(0x14, SUNXI_DRAM_PHY0_BASE + 0x368);
+		writel(0x14, SUNXI_DRAM_PHY0_BASE + 0x374);
+
+		writel(0, SUNXI_DRAM_PHY0_BASE + 0x18);
+		writel(0, SUNXI_DRAM_PHY0_BASE + 0x360);
+		writel(0, SUNXI_DRAM_PHY0_BASE + 0x36c);
+		writel(0, SUNXI_DRAM_PHY0_BASE + 0x378);
+
+		writel(0xa, SUNXI_DRAM_PHY0_BASE + 0x1c);
+		writel(0xa, SUNXI_DRAM_PHY0_BASE + 0x364);
+		writel(0xa, SUNXI_DRAM_PHY0_BASE + 0x370);
+		writel(0xa, SUNXI_DRAM_PHY0_BASE + 0x37c);	
+	}
+
 	ptr = (u32 *)(SUNXI_DRAM_PHY0_BASE + 0xc0);
 
 	if (para->type == SUNXI_DRAM_TYPE_DDR3)
@@ -851,7 +890,9 @@ static bool mctl_phy_init(struct dram_para *para)
 	if (para->type == SUNXI_DRAM_TYPE_LPDDR3)
 		for (i = 0; i < ARRAY_SIZE(phy_init_lpddr3); i++)
 			writel(phy_init_lpddr3[i], &ptr[i]);
-
+	if (para->type == SUNXI_DRAM_TYPE_LPDDR4)
+		for (i = 0; i < ARRAY_SIZE(phy_init_lpddr4); i++)
+			writel(phy_init_lpddr4[i], &ptr[i]);
 
 	if (para->tpr10 & TPR10_UNKNOWN_FEAT0) {
 		if (para->tpr0 & BIT(30))
@@ -901,6 +942,12 @@ static bool mctl_phy_init(struct dram_para *para)
 		writel(0xc0, SUNXI_DRAM_PHY0_BASE + 0x3dc);
 		writel(0xc0, SUNXI_DRAM_PHY0_BASE + 0x45c);
 	}
+	if (para->type == SUNXI_DRAM_TYPE_LPDDR4) {
+		writel(0x37, SUNXI_DRAM_PHY0_BASE + 0x3dc);
+		writel(0x37, SUNXI_DRAM_PHY0_BASE + 0x45c);
+		val = (para->tpr10 >> 7) & 0x1e;
+		writel(val, SUNXI_DRAM_PHY0_BASE + 0x788);
+	}
 
 	mctl_phy_configure_odt(para);
 
@@ -908,6 +955,10 @@ static bool mctl_phy_init(struct dram_para *para)
 		clrsetbits_le32(SUNXI_DRAM_PHY0_BASE + 4, 7, 0xa);
 	if (para->type == SUNXI_DRAM_TYPE_LPDDR3)
 		clrsetbits_le32(SUNXI_DRAM_PHY0_BASE + 4, 7, 0xb);
+	if (para->type == SUNXI_DRAM_TYPE_DDR4)
+		clrsetbits_le32(SUNXI_DRAM_PHY0_BASE + 4, 7, 0xc);
+	if (para->type == SUNXI_DRAM_TYPE_LPDDR4)
+		clrsetbits_le32(SUNXI_DRAM_PHY0_BASE + 4, 7, 0xd);
 
 	if (para->clk <= 672)
 		writel(0xf, SUNXI_DRAM_PHY0_BASE + 0x20);
@@ -987,7 +1038,43 @@ static bool mctl_phy_init(struct dram_para *para)
 		writel(0x800000f0, &mctl_ctl->mrctrl0);
 		mctl_await_completion(&mctl_ctl->mrctrl0, BIT(31), 0);
 	}
-	
+	if (para->type == SUNXI_DRAM_TYPE_LPDDR4) {
+		writel(0x0, &mctl_ctl->mrctrl1);
+		writel(0x80000030, &mctl_ctl->mrctrl0);
+		mctl_await_completion(&mctl_ctl->mrctrl0, BIT(31), 0);
+
+		writel(0x134, &mctl_ctl->mrctrl1);
+		writel(0x80000030, &mctl_ctl->mrctrl0);
+		mctl_await_completion(&mctl_ctl->mrctrl0, BIT(31), 0);
+
+		writel(0x21b, &mctl_ctl->mrctrl1);
+		writel(0x80000030, &mctl_ctl->mrctrl0);
+		mctl_await_completion(&mctl_ctl->mrctrl0, BIT(31), 0);
+
+		writel(0x333, &mctl_ctl->mrctrl1);
+		writel(0x80000030, &mctl_ctl->mrctrl0);
+		mctl_await_completion(&mctl_ctl->mrctrl0, BIT(31), 0);
+
+		writel(0x403, &mctl_ctl->mrctrl1);
+		writel(0x80000030, &mctl_ctl->mrctrl0);
+		mctl_await_completion(&mctl_ctl->mrctrl0, BIT(31), 0);
+
+		writel(0xb04, &mctl_ctl->mrctrl1);
+		writel(0x80000030, &mctl_ctl->mrctrl0);
+		mctl_await_completion(&mctl_ctl->mrctrl0, BIT(31), 0);
+
+		writel(0xc72, &mctl_ctl->mrctrl1);
+		writel(0x80000030, &mctl_ctl->mrctrl0);
+		mctl_await_completion(&mctl_ctl->mrctrl0, BIT(31), 0);
+
+		writel(0xe09, &mctl_ctl->mrctrl1);
+		writel(0x80000030, &mctl_ctl->mrctrl0);
+		mctl_await_completion(&mctl_ctl->mrctrl0, BIT(31), 0);
+
+		writel(0x1624, &mctl_ctl->mrctrl1);
+		writel(0x80000030, &mctl_ctl->mrctrl0);
+		mctl_await_completion(&mctl_ctl->mrctrl0, BIT(31), 0);
+	}
 
 	writel(0, SUNXI_DRAM_PHY0_BASE + 0x54);
 
@@ -1054,18 +1141,24 @@ static bool mctl_ctrl_init(struct dram_para *para)
 	writel(0x8000, &mctl_ctl->clken);
 
 	setbits_le32(&mctl_com->unk_0x008, 0xff00);
-
+	if (para->type == SUNXI_DRAM_TYPE_LPDDR4)
+		writel(1, SUNXI_DRAM_COM_BASE + 0x50);
 	clrsetbits_le32(&mctl_ctl->sched[0], 0xff00, 0x3000);
 
 	writel(0, &mctl_ctl->hwlpctl);
 
 	setbits_le32(&mctl_com->unk_0x008, 0xff00);
-
-	reg_val = MSTR_BURST_LENGTH(8) | MSTR_ACTIVE_RANKS(para->ranks);
+	
+	if (para->type == SUNXI_DRAM_TYPE_LPDDR4)
+		reg_val = MSTR_BURST_LENGTH(0x10) | MSTR_ACTIVE_RANKS(para->ranks);
+	else
+		reg_val = MSTR_BURST_LENGTH(8) | MSTR_ACTIVE_RANKS(para->ranks);
 	if (para->type == SUNXI_DRAM_TYPE_DDR3)
 		reg_val |= MSTR_DEVICETYPE_DDR3 | MSTR_2TMODE;
 	if (para->type == SUNXI_DRAM_TYPE_LPDDR3)
 		reg_val |= MSTR_DEVICETYPE_LPDDR3;
+	if (para->type == SUNXI_DRAM_TYPE_LPDDR4)
+		reg_val |= MSTR_DEVICETYPE_LPDDR4;
 	if (para->bus_full_width)
 		reg_val |= MSTR_BUSWIDTH_FULL;
 	else
@@ -1089,6 +1182,12 @@ static bool mctl_ctrl_init(struct dram_para *para)
 		writel(0x09020400, &mctl_ctl->unk_0x3240);
 		writel(0x09020400, &mctl_ctl->unk_0x4240);
 	}
+	if (para->type == SUNXI_DRAM_TYPE_LPDDR4) {
+		writel(0x04000400, &mctl_ctl->odtcfg);
+		writel(0x04000400, &mctl_ctl->unk_0x2240);
+		writel(0x04000400, &mctl_ctl->unk_0x3240);
+		writel(0x04000400, &mctl_ctl->unk_0x4240);
+	}
 
 	writel(BIT(31), &mctl_com->cr);
 
@@ -1103,6 +1202,10 @@ static bool mctl_ctrl_init(struct dram_para *para)
 	setbits_le32(&mctl_ctl->unk_0x2180, BIT(31) | BIT(30));
 	setbits_le32(&mctl_ctl->unk_0x3180, BIT(31) | BIT(30));
 	setbits_le32(&mctl_ctl->unk_0x4180, BIT(31) | BIT(30));
+
+	//(LP)DDR4 only set_controller_dbi
+	if (para->type == SUNXI_DRAM_TYPE_LPDDR4)
+		setbits_le32(&mctl_ctl->dbictl, 0x1);
 
 	setbits_le32(&mctl_ctl->rfshctl3, BIT(0));
 	clrbits_le32(&mctl_ctl->dfimisc, BIT(0));
@@ -1231,6 +1334,8 @@ unsigned long sunxi_dram_init(void)
 		.type = SUNXI_DRAM_TYPE_DDR3,
 #elif defined(CONFIG_SUNXI_DRAM_H616_LPDDR3)
 		.type = SUNXI_DRAM_TYPE_LPDDR3,
+#elif defined(CONFIG_SUNXI_DRAM_H616_LPDDR4)
+		.type = SUNXI_DRAM_TYPE_LPDDR4,
 #endif
 		.dx_odt = CONFIG_DRAM_SUN50I_H616_DX_ODT,
 		.dx_dri = CONFIG_DRAM_SUN50I_H616_DX_DRI,

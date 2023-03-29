@@ -6,3 +6,4 @@ obj-$(CONFIG_SUNXI_DRAM_H6_DDR3_1333)	+= h6_ddr3_1333.o
 # currently only DDR3 is supported on H616
 obj-$(CONFIG_SUNXI_DRAM_H616_DDR3_1333)	+= h616_ddr3_1333.o
 obj-$(CONFIG_SUNXI_DRAM_H616_LPDDR3)	+= h616_lpddr3.o
+obj-$(CONFIG_SUNXI_DRAM_H616_LPDDR4)	+= h616_lpddr4.o
