@@ -148,6 +148,7 @@ check_member(sunxi_mctl_ctl_reg, unk_0x4240, 0x4240);
 struct dram_para {
 	u32 clk;
 	enum sunxi_dram_type type;
+	u8 phy_init[27];
 	u8 cols;
 	u8 rows;
 	u8 ranks;
