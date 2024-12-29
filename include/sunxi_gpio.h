@@ -19,7 +19,7 @@
 #elif defined(CONFIG_SUN50I_GEN_H6)
 #define SUNXI_PIO_BASE		0x0300b000
 #define SUNXI_R_PIO_BASE	0x07022000
-#elif defined(CONFIG_SUNXI_GEN_NCAT2)
+#elif defined(CONFIG_SUNXI_GEN_NCAT2) || defined(CONFIG_MACH_SUN55I_T527)
 #define SUNXI_PIO_BASE		0x02000000
 #define SUNXI_R_PIO_BASE	0x07022000
 #else
@@ -120,6 +120,7 @@ enum sunxi_gpio_number {
 #define SUN8I_A83T_GPB_UART0	2
 #define SUN8I_V3S_GPB_UART0	3
 #define SUN50I_GPB_UART0	4
+#define SUN55I_GPB_UART0	2
 
 #define SUNXI_GPC_NAND		2
 #define SUNXI_GPC_SPI0		3

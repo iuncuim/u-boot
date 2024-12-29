@@ -24,6 +24,8 @@
 #include <asm/arch/clock_sun6i.h>
 #elif defined(CONFIG_MACH_SUN9I)
 #include <asm/arch/clock_sun9i.h>
+#elif defined(CONFIG_SUN55I_GEN_T527)
+#include <asm/arch/clock_sun55i_t527.h>
 #else
 #include <asm/arch/clock_sun4i.h>
 #endif

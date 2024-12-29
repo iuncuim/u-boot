@@ -12,6 +12,8 @@
 #include <asm/arch/cpu_sun50i_h6.h>
 #elif defined(CONFIG_SUNXI_GEN_NCAT2)
 #include <asm/arch/cpu_sunxi_ncat2.h>
+#elif defined(CONFIG_SUN55I_GEN_T527)
+#include <asm/arch/cpu_sun55i_t527.h>
 #else
 #include <asm/arch/cpu_sun4i.h>
 #endif

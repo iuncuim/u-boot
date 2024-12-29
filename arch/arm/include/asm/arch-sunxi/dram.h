@@ -33,6 +33,8 @@
 #include <asm/arch/dram_sun50i_h616.h>
 #elif defined(CONFIG_MACH_SUNIV)
 #include <asm/arch/dram_suniv.h>
+#elif defined(CONFIG_MACH_SUN55I_T527)
+#include <asm/arch/dram_sun55i_t527.h>
 #else
 #include <asm/arch/dram_sun4i.h>
 #endif

@@ -82,6 +82,7 @@ config SPL_MAX_SIZE
 	default 0x7fa0 if SUNXI_SRAM_ADDRESS = 0x10000
 	default 0x7fa0 if SUNXI_SRAM_ADDRESS = 0x20000 && !MACH_SUN50I_H616
 	default 0xbfa0 if MACH_SUN50I_H616
+	default 0x17fa0 if SUN55I_GEN_T527
 	default 0x7000 if RCAR_GEN3
 	default 0x5fa0 if SUNXI_SRAM_ADDRESS = 0x0
 	default 0x10000 if ASPEED_AST2600
@@ -266,6 +267,7 @@ config SPL_TEXT_BASE
 	default 0x40301350 if OMAP54XX
 	default 0x10060 if MACH_SUN50I || MACH_SUN50I_H5 || MACH_SUN9I
 	default 0x20060 if SUN50I_GEN_H6 || SUNXI_GEN_NCAT2
+	default 0x44060 if SUN55I_GEN_T527
 	default 0x00060 if ARCH_SUNXI
 	default 0xfffc0000 if ARCH_ZYNQMP
 	default 0x0
@@ -389,6 +391,7 @@ config SPL_STACK
 	default 0x40000 if MACH_SUN8I_R528
 	default 0x54000 if MACH_SUN50I || MACH_SUN50I_H5
 	default 0x18000 if MACH_SUN9I
+	default 0x28000 if SUN55I_GEN_T527
 	default 0x8000 if ARCH_SUNXI
 	help
 	  Address of the start of the stack SPL will use before SDRAM is

@@ -116,6 +116,13 @@ config AXP717_POWER
 	---help---
 	Select this to enable support for the AXP717 PMIC found on some boards.
 
+config AXP717C_POWER
+	bool "axp717c pmic support"
+	select AXP_PMIC_BUS
+	select CMD_POWEROFF
+	---help---
+	Select this to enable support for the AXP717C PMIC found on some boards.
+
 config AXP809_POWER
 	bool "axp809 pmic support"
 	depends on MACH_SUN9I
@@ -144,9 +151,10 @@ endchoice
 
 config AXP_DCDC1_VOLT
 	int "axp pmic dcdc1 voltage"
-	depends on AXP221_POWER || AXP809_POWER || AXP818_POWER
+	depends on AXP221_POWER || AXP809_POWER || AXP818_POWER || AXP717C_POWER
 	default 3300 if AXP818_POWER || MACH_SUN8I_R40
 	default 3000 if MACH_SUN6I || MACH_SUN8I || MACH_SUN9I
+	default 1100 if AXP717C_POWER
 	---help---
 	Set the voltage (mV) to program the axp pmic dcdc1 at, set to 0 to
 	disable dcdc1. On A23 / A31 / A33 (axp221) boards dcdc1 is used for
@@ -158,7 +166,7 @@ config AXP_DCDC1_VOLT
 
 config AXP_DCDC2_VOLT
 	int "axp pmic dcdc2 voltage"
-	depends on AXP152_POWER || AXP209_POWER || AXP221_POWER || AXP809_POWER || AXP818_POWER || AXP313_POWER || AXP717_POWER
+	depends on AXP152_POWER || AXP209_POWER || AXP221_POWER || AXP809_POWER || AXP818_POWER || AXP313_POWER || AXP717_POWER || AXP717C_POWER
 	default 900 if AXP818_POWER
 	default 1400 if AXP152_POWER || AXP209_POWER
 	default 1000 if AXP313_POWER
@@ -179,7 +187,7 @@ config AXP_DCDC2_VOLT
 
 config AXP_DCDC3_VOLT
 	int "axp pmic dcdc3 voltage"
-	depends on AXP152_POWER || AXP209_POWER || AXP221_POWER || AXP809_POWER || AXP818_POWER || AXP313_POWER || AXP717_POWER
+	depends on AXP152_POWER || AXP209_POWER || AXP221_POWER || AXP809_POWER || AXP818_POWER || AXP313_POWER || AXP717_POWER || AXP717C_POWER
 	default 900 if AXP809_POWER || AXP818_POWER
 	default 1500 if AXP152_POWER
 	default 1250 if AXP209_POWER
@@ -201,12 +209,13 @@ config AXP_DCDC3_VOLT
 
 config AXP_DCDC4_VOLT
 	int "axp pmic dcdc4 voltage"
-	depends on AXP152_POWER || AXP221_POWER || AXP809_POWER || AXP305_POWER
+	depends on AXP152_POWER || AXP221_POWER || AXP809_POWER || AXP305_POWER || AXP717C_POWER
 	default 1250 if AXP152_POWER
 	default 1200 if MACH_SUN6I
 	default 0 if MACH_SUN8I
 	default 900 if MACH_SUN9I
 	default 1500 if AXP305_POWER
+	default 3300 if AXP717C_POWER
 	---help---
 	Set the voltage (mV) to program the axp pmic dcdc4 at, set to 0 to
 	disable dcdc4.

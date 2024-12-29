@@ -12,10 +12,22 @@
 #define WDT_CTRL_RESTART	(0x1 << 0)
 #define WDT_CTRL_KEY		(0x0a57 << 1)
 
-#if defined(CONFIG_MACH_SUN4I) || \
-    defined(CONFIG_MACH_SUN5I) || \
-    defined(CONFIG_MACH_SUN7I) || \
-    defined(CONFIG_MACH_SUN8I_R40)
+#if defined(CONFIG_SUN55I_GEN_T527)
+
+struct sunxi_wdog {
+	u32 irq_en;		/* 0x00 */
+	u32 irq_sta;		/* 0x04 */
+	u32 srst;		/* 0x08 */
+	u32 ctl;		/* 0x0c */
+	u32 cfg;		/* 0x10 */
+	u32 mode;		/* 0x14 */
+	u32 ocfg;		/* 0x18 */
+};
+
+#elif defined(CONFIG_MACH_SUN4I) || \
+      defined(CONFIG_MACH_SUN5I) || \
+      defined(CONFIG_MACH_SUN7I) || \
+      defined(CONFIG_MACH_SUN8I_R40)
 
 #define WDT_MODE_EN		(0x1 << 0)
 #define WDT_MODE_RESET_EN	(0x1 << 1)

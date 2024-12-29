@@ -150,6 +150,10 @@ static int gpio_init(void)
 	sunxi_gpio_set_cfgpin(SUNXI_GPE(2), 6);
 	sunxi_gpio_set_cfgpin(SUNXI_GPE(3), 6);
 	sunxi_gpio_set_pull(SUNXI_GPE(3), SUNXI_GPIO_PULL_UP);
+#elif CONFIG_CONS_INDEX == 1 && defined(CONFIG_MACH_SUN55I_T527)
+	sunxi_gpio_set_cfgpin(SUNXI_GPB(9), SUN55I_GPB_UART0);
+	sunxi_gpio_set_cfgpin(SUNXI_GPB(10), SUN55I_GPB_UART0);
+	sunxi_gpio_set_pull(SUNXI_GPB(10), SUNXI_GPIO_PULL_UP);
 #elif CONFIG_CONS_INDEX == 2 && defined(CONFIG_MACH_SUNIV)
 	sunxi_gpio_set_cfgpin(SUNXI_GPA(2), SUNIV_GPE_UART0);
 	sunxi_gpio_set_cfgpin(SUNXI_GPA(3), SUNIV_GPE_UART0);
@@ -188,13 +192,19 @@ static int gpio_init(void)
 	 * detected value.
 	 */
 	if (IS_ENABLED(CONFIG_SUN50I_GEN_H6) ||
-	    IS_ENABLED(CONFIG_SUN50I_GEN_NCAT2)) {
+	    IS_ENABLED(CONFIG_SUN50I_GEN_NCAT2) ||
+	    IS_ENABLED(CONFIG_SUN55I_GEN_T527)) {
 		val = readl(SUNXI_PIO_BASE + SUN50I_H6_GPIO_POW_MOD_VAL);
 		writel(val, SUNXI_PIO_BASE + SUN50I_H6_GPIO_POW_MOD_SEL);
 	}
 	if (IS_ENABLED(CONFIG_SUN50I_GEN_H6)) {
 		val = readl(SUNXI_R_PIO_BASE + SUN50I_H6_GPIO_POW_MOD_VAL);
 		writel(val, SUNXI_R_PIO_BASE + SUN50I_H6_GPIO_POW_MOD_SEL);
+	}
+
+	if (IS_ENABLED(CONFIG_SUN55I_GEN_T527)) {
+		val = readl(SUNXI_R_PIO_BASE + SUN50I_H6_GPIO_POW_MOD_VAL);
+		clrsetbits_le32(SUNXI_R_PIO_BASE + SUN50I_H6_GPIO_POW_MOD_SEL, 3, val & 3);
 	}
 
 	return 0;
@@ -483,7 +493,13 @@ void board_init_f(ulong dummy)
 #if !CONFIG_IS_ENABLED(SYSRESET)
 void reset_cpu(void)
 {
-#if defined(CONFIG_SUNXI_GEN_SUN4I) || defined(CONFIG_MACH_SUN8I_R40)
+#if defined(CONFIG_SUN55I_GEN_T527)
+	static const struct sunxi_wdog *wdog =
+		 (struct sunxi_wdog *)SUNXI_WDOG_BASE;
+
+	writel(WDT_CTRL_KEY | WDT_CTRL_RESTART, &wdog->srst);
+	while (1) { }
+#elif defined(CONFIG_SUNXI_GEN_SUN4I) || defined(CONFIG_MACH_SUN8I_R40)
 	static const struct sunxi_wdog *wdog =
 		 &((struct sunxi_timer_reg *)SUNXI_TIMER_BASE)->wdog;
 

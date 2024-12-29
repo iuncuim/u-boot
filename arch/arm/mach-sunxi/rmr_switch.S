@@ -30,10 +30,12 @@
 
 .text
 
-#ifndef CONFIG_SUN50I_GEN_H6
-	ldr	r1, =0x017000a0		@ MMIO mapped RVBAR[0] register
-#else
+#if defined(CONFIG_SUN55I_GEN_T527)
+	ldr	r1, =0x08000040		@ MMIO mapped RVBAR[0] register
+#elif defined(CONFIG_SUN50I_GEN_H6)
 	ldr	r1, =0x09010040		@ MMIO mapped RVBAR[0] register
+#else
+	ldr	r1, =0x017000a0		@ MMIO mapped RVBAR[0] register
 #endif
 	ldr	r0, =0x57aA7add		@ start address, to be replaced
 	str	r0, [r1]

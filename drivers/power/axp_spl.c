@@ -36,6 +36,21 @@ static const struct axp_reg_desc_spl axp_spl_dcdc_regulators[] = {
 #define AXP_SHUTDOWN_REG	0x27
 #define AXP_SHUTDOWN_MASK	BIT(0)
 
+#elif defined(CONFIG_AXP717C_POWER)				/* AXP717C */
+
+static const struct axp_reg_desc_spl axp_spl_dcdc_regulators[] = {
+	{ 0x80, BIT(0), 0x83, 0x7f,  500,  1540,  10,  70 },
+	{ 0x80, BIT(1), 0x84, 0x7f,  500,  1540,  10,  70 },
+	{ 0x80, BIT(2), 0x85, 0x7f,  500,  1840,  10,  70 },
+	{ 0x80, BIT(3), 0x86, 0x7f,  1000, 3700,  100, NA },
+};
+
+#define AXP_CHIP_VERSION	0xe
+#define AXP_CHIP_VERSION_MASK	0xff
+#define AXP_CHIP_ID		0x2
+#define AXP_SHUTDOWN_REG	0x27
+#define AXP_SHUTDOWN_MASK	BIT(0)
+
 #elif defined(CONFIG_AXP313_POWER)				/* AXP313 */
 
 static const struct axp_reg_desc_spl axp_spl_dcdc_regulators[] = {
@@ -153,6 +168,27 @@ int axp_init(void)
 			debug("unknown PMIC: 0x%x\n", axp_chip_id);
 			return -EINVAL;
 		}
+	}
+
+	if (IS_ENABLED(CONFIG_AXP717C_POWER)) {
+		u8 ver, moden;
+
+		ret = pmic_bus_read(0xf, &ver);
+		if (ret)
+			return ret;
+
+		ret = pmic_bus_read(0x19, &moden);
+		if (ret)
+			return ret;
+
+		if (ver)
+			moden |= BIT(4);
+		else
+			moden &= ~BIT(4);
+
+		ret = pmic_bus_write(0x19, moden);
+		if (ret)
+			return ret;
 	}
 
 	return 0;

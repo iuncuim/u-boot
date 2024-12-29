@@ -44,7 +44,7 @@ ENTRY(return_to_fel)
 #ifdef CONFIG_MACH_SUN50I_H616
 	ldr	w2, =(SUNXI_R_CPUCFG_BASE + 0x1c0)
 	str	w0, [x2], #0x4
-#elif CONFIG_MACH_SUN50I_H6
+#elif defined(CONFIG_MACH_SUN50I_H6) || defined(CONFIG_MACH_SUN55I_T527)
 	ldr	w2, =(SUNXI_RTC_BASE + 0x1b8)	// BOOT_CPU_HP_FLAG_REG
 	str	w0, [x2], #0x4
 #else
