@@ -148,19 +148,15 @@ check_member(sunxi_mctl_ctl_reg, unk_0x4240, 0x4240);
 #define TPR10_WRITE_TRAINING	BIT(23)
 
 struct dram_para {
-	u32 clk;
 	enum sunxi_dram_type type;
 	u32 dx_odt;
 	u32 dx_dri;
 	u32 ca_dri;
-	u32 odt_en;
 	u32 tpr0;
 	u32 tpr1;
 	u32 tpr2;
 	u32 tpr6;
 	u32 tpr10;
-	u32 tpr11;
-	u32 tpr12;
 };
 
 struct dram_config {
@@ -168,15 +164,20 @@ struct dram_config {
 	u8 rows;
 	u8 ranks;
 	u8 bus_full_width;
+	u32 clk;
+	u32 odt_en;
+	u32 tpr11;
+	u32 tpr12;
+	u32 tpr14;
 };
 
-static inline int ns_to_t(int nanoseconds)
+static inline int ns_to_t(int nanoseconds, u32 clk)
 {
-	const unsigned int ctrl_freq = CONFIG_DRAM_CLK / 2;
+	const unsigned int ctrl_freq = clk / 2;
 
 	return DIV_ROUND_UP(ctrl_freq * nanoseconds, 1000);
 }
 
-void mctl_set_timing_params(const struct dram_para *para);
+void mctl_set_timing_params(u32 clk);
 
 #endif /* _SUNXI_DRAM_SUN55I_T527_H */

@@ -183,9 +183,9 @@ static bool mctl_phy_write_leveling(const struct dram_para *para,
 	clrsetbits_le32(SUNXI_DRAM_PHY0_BASE + 4, 0xf00, 0xe00);
 
 	if (para->type == SUNXI_DRAM_TYPE_LPDDR4) {
-		if (para->clk <= 936)
+		if (config->clk <= 936)
 			mr2 = 0x1b;
-		else if (para->clk <= 1200)
+		else if (config->clk <= 1200)
 			mr2 = 0x2d;
 		else
 			mr2 = 0x36;
@@ -490,19 +490,17 @@ static bool mctl_phy_write_training(const struct dram_config *config)
 	return result;
 }
 
-static void mctl_phy_bit_delay_compensation(const struct dram_para *para)
+static void mctl_phy_bit_delay_compensation(const struct dram_para *para,
+					    const struct dram_config *config)
 {
-	u32 array0[32] = {0xc9, 0xca, 0xc8, 0xc8, 0xcd, 0xc9, 0xcb, 0xc7, 0xd3, 0xd2, 0xd3, 0xd3, 0xca, 0xce, 0xcc, 0xcd,
-			  0xcb, 0xcd, 0xc1, 0xce, 0xc8, 0xce, 0xca, 0xcb, 0xca, 0xc6, 0xc2, 0xc8, 0xcd, 0xc4, 0xcd, 0xc9};
-	u32 array1[32] = {0x30, 0x32, 0x30, 0x30, 0x32, 0x2e, 0x31, 0x2d, 0x36, 0x36, 0x35, 0x35, 0x2d, 0x31, 0x30, 0x31,
-			  0x38, 0x36, 0x30, 0x37, 0x31, 0x36, 0x32, 0x33, 0x34, 0x33, 0x31, 0x34, 0x37, 0x32, 0x35, 0x33};
+	u8 array0[32], array1[32];
 	u32 tmp;
-	/*int i;
+	int i;
 
 	for (i = 0; i < 32; i++) {
-		array0[i] = (para->tpr11 >> i) & 0xff;
-		array1[i] = (para->tpr12 >> i) & 0x7f;
-	}*/
+		array0[i] = (config->tpr11 >> (i & 0xf8)) & 0xff;
+		array1[i] = (config->tpr12 >> (i & 0xf8)) & 0x7f;
+	}
 
 	if (para->tpr10 & TPR10_DX_BIT_DELAY1) {
 		setbits_le32(SUNXI_DRAM_PHY0_BASE + 0x84, 0x40000);
@@ -526,7 +524,7 @@ static void mctl_phy_bit_delay_compensation(const struct dram_para *para)
 		writel((array0[0] << 24) | (array0[1] << 16) | (array0[2] << 8) | array0[3], SUNXI_DRAM_PHY0_BASE + 0x420);
 		writel((array0[4] << 24) | (array0[5] << 16) | (array0[6] << 8) | array0[7], SUNXI_DRAM_PHY0_BASE + 0x424);
 
-		tmp = para->odt_en & 0xff;
+		tmp = config->odt_en & 0xff;
 		tmp = (tmp << 24) | (tmp << 8);
 		writel(tmp, SUNXI_DRAM_PHY0_BASE + 0x32c);
 		writel(tmp, SUNXI_DRAM_PHY0_BASE + 0x34c);
@@ -549,7 +547,7 @@ static void mctl_phy_bit_delay_compensation(const struct dram_para *para)
 		writel((array0[8] << 24) | (array0[9] << 16) | (array0[10] << 8) | array0[11], SUNXI_DRAM_PHY0_BASE + 0x5a0);
 		writel((array0[12] << 24) | (array0[13] << 16) | (array0[14] << 8) | array0[15], SUNXI_DRAM_PHY0_BASE + 0x5a4);
 
-		tmp = (para->odt_en >> 8) & 0xff;
+		tmp = (config->odt_en >> 8) & 0xff;
 		tmp = (tmp << 24) | (tmp << 8);
 		writel(tmp, SUNXI_DRAM_PHY0_BASE + 0x4ac);
 		writel(tmp, SUNXI_DRAM_PHY0_BASE + 0x4cc);
@@ -572,7 +570,7 @@ static void mctl_phy_bit_delay_compensation(const struct dram_para *para)
 		writel((array0[16] << 24) | (array0[17] << 16) | (array0[18] << 8) | array0[19], SUNXI_DRAM_PHY0_BASE + 0x720);
 		writel((array0[20] << 24) | (array0[21] << 16) | (array0[22] << 8) | array0[23], SUNXI_DRAM_PHY0_BASE + 0x724);
 
-		tmp = (para->odt_en >> 16) & 0xff;
+		tmp = (config->odt_en >> 16) & 0xff;
 		tmp = (tmp << 24) | (tmp << 8);
 		writel(tmp, SUNXI_DRAM_PHY0_BASE + 0x62c);
 		writel(tmp, SUNXI_DRAM_PHY0_BASE + 0x64c);
@@ -595,7 +593,7 @@ static void mctl_phy_bit_delay_compensation(const struct dram_para *para)
 		writel((array0[24] << 24) | (array0[25] << 16) | (array0[26] << 8) | array0[27], SUNXI_DRAM_PHY0_BASE + 0x8a0);
 		writel((array0[28] << 24) | (array0[29] << 16) | (array0[30] << 8) | array0[31], SUNXI_DRAM_PHY0_BASE + 0x8a4);
 
-		tmp = (para->odt_en >> 24) & 0xff;
+		tmp = (config->odt_en >> 24) & 0xff;
 		tmp = (tmp << 24) | (tmp << 8);
 		writel(tmp, SUNXI_DRAM_PHY0_BASE + 0x7ac);
 		writel(tmp, SUNXI_DRAM_PHY0_BASE + 0x7cc);
@@ -608,9 +606,6 @@ static void mctl_phy_bit_delay_compensation(const struct dram_para *para)
 	}
 
 	if (para->tpr10 & TPR10_DX_BIT_DELAY0) {
-		//TODO: move to Kconfig
-		u32 tpr14 = 0x48484848;
-
 		setbits_le32(SUNXI_DRAM_PHY0_BASE + 0x84, 0x40000);
 
 		writel(array1[0] << 8, SUNXI_DRAM_PHY0_BASE + 0x330);
@@ -629,7 +624,7 @@ static void mctl_phy_bit_delay_compensation(const struct dram_para *para)
 		writel((array1[0] << 24) | (array1[1] << 16) | (array1[2] << 8) | array1[3], SUNXI_DRAM_PHY0_BASE + 0x430);
 		writel((array1[4] << 24) | (array1[5] << 16) | (array1[6] << 8) | array1[7], SUNXI_DRAM_PHY0_BASE + 0x434);
 
-		tmp = tpr14 & 0xff;
+		tmp = config->tpr14 & 0xff;
 		tmp = (tmp << 24) | (tmp << 8);
 		writel(tmp, SUNXI_DRAM_PHY0_BASE + 0x33c);
 		writel(tmp, SUNXI_DRAM_PHY0_BASE + 0x35c);
@@ -652,7 +647,7 @@ static void mctl_phy_bit_delay_compensation(const struct dram_para *para)
 		writel((array1[8] << 24) | (array1[9] << 16) | (array1[10] << 8) | array1[11], SUNXI_DRAM_PHY0_BASE + 0x5b0);
 		writel((array1[12] << 24) | (array1[13] << 16) | (array1[14] << 8) | array1[15], SUNXI_DRAM_PHY0_BASE + 0x5b4);
 
-		tmp = (tpr14 >> 8) & 0xff;
+		tmp = (config->tpr14 >> 8) & 0xff;
 		tmp = (tmp << 24) | (tmp << 8);
 		writel(tmp, SUNXI_DRAM_PHY0_BASE + 0x4bc);
 		writel(tmp, SUNXI_DRAM_PHY0_BASE + 0x4dc);
@@ -675,7 +670,7 @@ static void mctl_phy_bit_delay_compensation(const struct dram_para *para)
 		writel((array1[16] << 24) | (array1[17] << 16) | (array1[18] << 8) | array1[19], SUNXI_DRAM_PHY0_BASE + 0x730);
 		writel((array1[20] << 24) | (array1[21] << 16) | (array1[22] << 8) | array1[23], SUNXI_DRAM_PHY0_BASE + 0x734);
 
-		tmp = (tpr14 >> 16) & 0xff;
+		tmp = (config->tpr14 >> 16) & 0xff;
 		tmp = (tmp << 24) | (tmp << 8);
 		writel(tmp, SUNXI_DRAM_PHY0_BASE + 0x63c);
 		writel(tmp, SUNXI_DRAM_PHY0_BASE + 0x65c);
@@ -698,7 +693,7 @@ static void mctl_phy_bit_delay_compensation(const struct dram_para *para)
 		writel((array1[24] << 24) | (array1[25] << 16) | (array1[26] << 8) | array1[27], SUNXI_DRAM_PHY0_BASE + 0x8b0);
 		writel((array1[28] << 24) | (array1[29] << 16) | (array1[30] << 8) | array1[31], SUNXI_DRAM_PHY0_BASE + 0x8b4);
 
-		tmp = (tpr14 >> 24) & 0xff;
+		tmp = (config->tpr14 >> 24) & 0xff;
 		tmp = (tmp << 24) | (tmp << 8);
 		writel(tmp, SUNXI_DRAM_PHY0_BASE + 0x7bc);
 		writel(tmp, SUNXI_DRAM_PHY0_BASE + 0x7dc);
@@ -780,10 +775,10 @@ static bool mctl_phy_init(const struct dram_para *para,
 
 	switch (para->type) {
 	case SUNXI_DRAM_TYPE_LPDDR4:
-		if (para->clk <= 936) {
+		if (config->clk <= 936) {
 			val = 10;
 			val2 = 20;
-		} else if (para->clk <= 1200) {
+		} else if (config->clk <= 1200) {
 			val = 14;
 			val2 = 28;
 		} else {
@@ -841,13 +836,13 @@ static bool mctl_phy_init(const struct dram_para *para,
 	setbits_le32(SUNXI_DRAM_PHY0_BASE + 0x00, 0x80);
 
 	// TODO: fix intervals
-	if (para->clk - 251 < 250) {
+	if (config->clk - 251 < 250) {
 		val = 0x18000000;
 		val2 = 0x18181818;
-	} else if (para->clk - 126 < 125) {
+	} else if (config->clk - 126 < 125) {
 		val = 0x28000000;
 		val2 = 0x28282828;
-	} else if (para->clk < 126) {
+	} else if (config->clk < 126) {
 		val = 0x38000000;
 		val2 = 0x38383838;
 	} else {
@@ -897,7 +892,7 @@ static bool mctl_phy_init(const struct dram_para *para,
 		setbits_le32(SUNXI_DRAM_PHY0_BASE + 0x908, 0x200);
 	}
 
-	if (para->clk < 936)
+	if (config->clk < 936)
 		val = 0x1b000000;
 	else
 		val = 0xc000000;
@@ -937,10 +932,10 @@ static bool mctl_phy_init(const struct dram_para *para,
 
 	switch (para->type) {
 	case SUNXI_DRAM_TYPE_LPDDR4:
-		if (para->clk <= 936) {
+		if (config->clk <= 936) {
 			mr1 = 0x34;
 			mr2 = 0x1b;
-		} else if (para->clk <= 1200) {
+		} else if (config->clk <= 1200) {
 			mr1 = 0x54;
 			mr2 = 0x2d;
 		} else {
@@ -1036,7 +1031,7 @@ static bool mctl_phy_init(const struct dram_para *para,
 		}
 	}
 
-	mctl_phy_bit_delay_compensation(para);
+	mctl_phy_bit_delay_compensation(para, config);
 
 	return true;
 }
@@ -1099,7 +1094,7 @@ static bool mctl_ctrl_init(const struct dram_para *para,
 
 	mctl_set_addrmap(config);
 
-	mctl_set_timing_params(para);
+	mctl_set_timing_params(config->clk);
 
 	writel(0, &mctl_ctl->pwrctl);
 
@@ -1134,7 +1129,7 @@ static bool mctl_ctrl_init(const struct dram_para *para,
 static bool mctl_core_init(const struct dram_para *para,
 			   const struct dram_config *config)
 {
-	mctl_sys_init(para->clk);
+	mctl_sys_init(config->clk);
 
 	return mctl_ctrl_init(para, config);
 }
@@ -1186,10 +1181,10 @@ static void mctl_auto_detect_dram_size(const struct dram_para *para,
 {
 	/* detect row address bits */
 	config->cols = 8;
-	config->rows = 18;
+	config->rows = 16;
 	mctl_core_init(para, config);
 
-	for (config->rows = 13; config->rows < 18; config->rows++) {
+	for (config->rows = 13; config->rows < 16; config->rows++) {
 		/* 8 banks, 8 bit per byte and 16/32 bit width */
 		if (mctl_mem_matches((1 << (config->rows + config->cols +
 					    4 + config->bus_full_width))))
@@ -1217,19 +1212,15 @@ static unsigned long mctl_calc_size(const struct dram_config *config)
 }
 
 static const struct dram_para para = {
-	.clk = CONFIG_DRAM_CLK,
 	.type = SUNXI_DRAM_TYPE_LPDDR4,
 	.dx_odt = CONFIG_DRAM_SUN50I_H616_DX_ODT,
 	.dx_dri = CONFIG_DRAM_SUN50I_H616_DX_DRI,
 	.ca_dri = CONFIG_DRAM_SUN50I_H616_CA_DRI,
-	.odt_en = CONFIG_DRAM_SUN50I_H616_ODT_EN,
 	.tpr0 = CONFIG_DRAM_SUN50I_H616_TPR0,
 	.tpr1 = CONFIG_DRAM_SUN50I_H616_TPR1,
 	.tpr2 = CONFIG_DRAM_SUN50I_H616_TPR2,
 	.tpr6 = CONFIG_DRAM_SUN50I_H616_TPR6,
 	.tpr10 = CONFIG_DRAM_SUN50I_H616_TPR10,
-	.tpr11 = CONFIG_DRAM_SUN50I_H616_TPR11,
-	.tpr12 = CONFIG_DRAM_SUN50I_H616_TPR12,
 };
 
 unsigned long sunxi_dram_init(void)
@@ -1237,16 +1228,29 @@ unsigned long sunxi_dram_init(void)
 	struct dram_config config;
 	unsigned long size;
 
-	config.cols = 10;
-	config.rows = 15;
-	config.bus_full_width = 1;
-	config.ranks = 1;
+	config.clk = 360;
+	switch (para.type) {
+	case SUNXI_DRAM_TYPE_LPDDR4:
+		config.odt_en = 0x84848484;
+		config.tpr11 = 0x9a9a9a9a;
+		config.tpr12 = 0x0e0f070a;
+		config.tpr14 = 0x48484848;
+		break;
+	default:
+		panic("This DRAM setup is currently not supported.\n");
+	};
 
 	setbits_le32(0x03000160, BIT(8));
 	clrbits_le32(0x03000168, 0x3f);
 
-	//mctl_auto_detect_rank_width(&para, &config);
-	//mctl_auto_detect_dram_size(&para, &config);
+	mctl_auto_detect_rank_width(&para, &config);
+	mctl_auto_detect_dram_size(&para, &config);
+
+	config.clk = CONFIG_DRAM_CLK;
+	config.odt_en = CONFIG_DRAM_SUN50I_H616_ODT_EN;
+	config.tpr11 = CONFIG_DRAM_SUN50I_H616_TPR11;
+	config.tpr12 = CONFIG_DRAM_SUN50I_H616_TPR12;
+	config.tpr14 = CONFIG_DRAM_SUN55I_T527_TPR14;
 
 	mctl_core_init(&para, &config);
 

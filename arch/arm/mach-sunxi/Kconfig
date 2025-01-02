@@ -120,6 +120,13 @@ config DRAM_SUN50I_H616_TPR12
 	default 0x0
 	help
 	  TPR12 value from vendor DRAM settings.
+
+config DRAM_SUN55I_T527_TPR14
+	hex "T527 DRAM TPR14 parameter"
+	depends on MACH_SUN55I_T527
+	default 0x48484848
+	help
+	  TPR14 value from vendor DRAM settings.
 endif
 
 config SUN6I_PRCM

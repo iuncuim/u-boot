@@ -12,7 +12,7 @@
 #include <asm/arch/dram.h>
 #include <asm/arch/cpu.h>
 
-void mctl_set_timing_params(const struct dram_para *para)
+void mctl_set_timing_params(u32 clk)
 {
 	struct sunxi_mctl_ctl_reg * const mctl_ctl =
 			(struct sunxi_mctl_ctl_reg *)SUNXI_DRAM_CTL0_BASE;
@@ -20,26 +20,26 @@ void mctl_set_timing_params(const struct dram_para *para)
 	unsigned int mr1, mr2;
 
 	u8 tccd		= 4;
-	u8 tfaw		= ns_to_t(40);
-	u8 trrd		= max(ns_to_t(10), 2);
-	u8 twtr		= max(ns_to_t(10), 4);
-	u8 trcd		= max(ns_to_t(18), 2);
-	u8 trc		= ns_to_t(65);
-	u8 txp		= max(ns_to_t(8), 2);
-	u8 trp		= ns_to_t(21);
-	u8 tras		= ns_to_t(42);
-	u16 trefi	= ns_to_t(3904) / 32;
-	u16 trfc	= ns_to_t(280);
-	u16 txsr	= ns_to_t(290);
+	u8 tfaw		= ns_to_t(40, clk);
+	u8 trrd		= max(ns_to_t(10, clk), 2);
+	u8 twtr		= max(ns_to_t(10, clk), 4);
+	u8 trcd		= max(ns_to_t(18, clk), 2);
+	u8 trc		= ns_to_t(65, clk);
+	u8 txp		= max(ns_to_t(8, clk), 2);
+	u8 trp		= ns_to_t(21, clk);
+	u8 tras		= ns_to_t(42, clk);
+	u16 trefi	= ns_to_t(3904, clk) / 32;
+	u16 trfc	= ns_to_t(280, clk);
+	u16 txsr	= ns_to_t(290, clk);
 
-	u8 tmrw		= max(ns_to_t(14), 5);
+	u8 tmrw		= max(ns_to_t(14, clk), 5);
 	u8 tmod		= 12;
-	u8 tcke		= max(ns_to_t(15), 2);
-	u8 tcksrx	= max(ns_to_t(2), 2);
-	u8 tcksre	= max(ns_to_t(5), 2);
+	u8 tcke		= max(ns_to_t(15, clk), 2);
+	u8 tcksrx	= max(ns_to_t(2, clk), 2);
+	u8 tcksre	= max(ns_to_t(5, clk), 2);
 	u8 trasmax	= (trefi * 9) / 32;
 
-	if (para->clk <= 936) {
+	if (clk <= 936) {
 		mr1 = 0x34;
 		mr2 = 0x1b;
 		tcl = 10;
@@ -48,7 +48,7 @@ void mctl_set_timing_params(const struct dram_para *para)
 		trtp = 4;
 		tphy_wrlat = 5;
 		twr = 10;
-	} else if (para->clk <= 1200) {
+	} else if (clk <= 1200) {
 		mr1 = 0x54;
 		mr2 = 0x2d;
 		tcl = 14;
@@ -72,7 +72,7 @@ void mctl_set_timing_params(const struct dram_para *para)
 	u8 tckesr	= tcke;
 	u8 twtp		= twr + 9 + tcwl;
 	u8 twr2rd	= twtr + 9 + tcwl;
-	u8 trd2wr	= ns_to_t(4) + 7 - ns_to_t(1) + tcl;
+	u8 trd2wr	= ns_to_t(4, clk) + 7 - ns_to_t(1, clk) + tcl;
 	u8 txs		= 4;
 	u8 txsdll	= 16;
 	u8 txsabort	= 4;
