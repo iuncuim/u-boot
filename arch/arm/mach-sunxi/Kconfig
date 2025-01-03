@@ -99,6 +99,7 @@ config DRAM_SUN50I_H616_TPR2
 
 config DRAM_SUN50I_H616_TPR6
 	hex "H616 DRAM TPR6 parameter"
+	default 0x33808080 if SUN55I_GEN_T527
 	default 0x3300c080
 	help
 	  TPR6 value from vendor DRAM settings.
@@ -594,6 +595,14 @@ config SUNXI_DRAM_DDR2_V3S
 	---help---
 	This option is only for the DDR2 memory chip which is co-packaged in
 	Allwinner V3s SoC.
+
+config SUNXI_DRAM_T527_DDR3
+	bool "DDR3 DRAM chips on the T527 DRAM controller"
+	select SUNXI_DRAM_DDR3
+	depends on DRAM_SUN55I_T527
+	help
+	  This option is the DDR3 timing used by the stock boot0 by
+	  Allwinner.
 
 config SUNXI_DRAM_T527_LPDDR4
 	bool "LPDDR4 DRAM chips on the H616 DRAM controller"
